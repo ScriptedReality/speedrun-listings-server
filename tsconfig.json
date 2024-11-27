@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "module": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "target": "ESNext",
+    "strict": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "#utils/*": ["src/utils/*"]
+    },
+    "sourceMap": true
+  },
+  "include": [
+    "src/**/*",
+  ]
+}
