@@ -15,7 +15,8 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": 1,
       "no-prototype-builtins": 1,
       "@typescript-eslint/no-unused-vars": 1,
-      "semi": ["warn", "always"]
+      "semi": ["warn", "always"],
+      "no-empty": "warn"
     }
   }
 );
