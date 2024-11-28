@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "mongodb": "^6.11.0"
   },
   "scripts": {
     "build": "tsc -b --clean && tsc -b",
