@@ -4,7 +4,7 @@ import database from "#utils/database-generator.js";
 
 const router = Router({ mergeParams: true });
 
-router.get("/:runID", async (request: Request<{ gamePageID: string; runID: string }>, response: Response) => {
+router.get("/", async (request: Request<{ gamePageID: string; runID: string }>, response: Response) => {
   const { gamePageID, runID } = request.params;
 
   let gamePageObjectID;
