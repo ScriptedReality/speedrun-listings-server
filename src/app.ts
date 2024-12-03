@@ -7,7 +7,11 @@ import { MongoClient } from "mongodb";
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.disable("x-powered-by");
 app.use("/runs", runsRouter);
 app.use("/accounts", accountsRouter);
