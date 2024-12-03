@@ -3,7 +3,6 @@ import accountsRouter from "./routes/accounts.js";
 import runsRouter from "./routes/runs.js";
 import gamePagesRouter from "./routes/game-pages.js";
 import cors from "cors";
-import { MongoClient } from "mongodb";
 
 const app = express();
 app.use(express.json());
