@@ -36,7 +36,23 @@ router.post("/", async (request, response) => {
 
   // Create an encrypted hash of the user's password.
   const hashedPassword = hashString(password);
-  
+
+  // Try to save the user's account data into a new entry on the database.
+  let accountID;
+  try {
+
+    const result = await accountsCollection.insertOne({emailAddress, username, password: hashedPassword});
+    accountID = result.insertedId;
+
+  } catch (error: unknown) {
+
+    console.error(error);
+
+    response.json({
+      message: "Something bad happened on our side. Try again later."
+    });
+
+  }
 
 });
 
