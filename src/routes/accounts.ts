@@ -1,12 +1,17 @@
 import database from "#utils/database-generator.js";
 import { Router } from "express";
+import { hash as hashString } from "argon2";
 
 const router = Router();
 
 router.post("/", async (request, response) => {
 
-  // Verify that an email address, username, and password were provided. 
+  // Verify that a valid email address, username, and password were provided. 
   const {emailAddress, username, password} = request.body;
+
+  if (typeof(emailAddress) !== "string") return response.status(400).json("Email address must be a string.");
+  if (typeof(username) !== "string") return response.status(400).json("Username must be a string.");
+  if (typeof(password) !== "string") return response.status(400).json("Password must be a string.");
   if (!emailAddress || !username || !password) {
 
     return response.status(400).json({
@@ -28,6 +33,10 @@ router.post("/", async (request, response) => {
     });
 
   }
+
+  // Create an encrypted hash of the user's password.
+  const hashedPassword = hashString(password);
+  
 
 });
 
