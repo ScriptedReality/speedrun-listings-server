@@ -80,7 +80,7 @@ router.post("/", async (request, response) => {
 
   }
 
-  // Return a 201 success, and a JSON response body with the token as the only key-value pair.
+  // Return a 201 success, and a JSON response body with the session data.
   return response.status(201).json(sessionData);
 
 });
