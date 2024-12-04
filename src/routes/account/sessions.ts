@@ -1,8 +1,7 @@
 import database from "#utils/database-generator.js";
 import { Router } from "express";
-import { verify as verifyPassword } from "argon2";
+import { hash as hashString, verify as verifyPassword } from "argon2";
 import { randomBytes } from "crypto";
-import { Collection, ObjectId } from "mongodb";
 
 const router = Router({mergeParams: true});
 
@@ -30,17 +29,13 @@ router.post("/", async (request, response) => {
 
   }
 
-  const accountsCollection: Collection<{
-    username: string;
-    password: string;
-    sessionIDs: ObjectId[]
-  }> = database.collection("accounts");
+  const accountsCollection = database.collection("accounts");
   const userFilter = {
     username: new RegExp(username, "i")
   };
   const userData = await accountsCollection.findOne(userFilter);
 
-  if (!userData || await verifyPassword(userData.password, password)) {
+  if (!(userData && await verifyPassword(userData.password, password))) {
 
     return response.status(401).json({
       message: "Incorrect username or password."
@@ -51,24 +46,18 @@ router.post("/", async (request, response) => {
   // Create a random hashed token and save it to the user's profile in the database.
   const sessionToken = randomBytes(64).toString("hex");
   const creationDate = new Date();
-  const expirationDate = creationDate;
+  const expirationDate = new Date(creationDate);
   expirationDate.setDate(creationDate.getDate() + 30);
   const sessionData = {
-    token: sessionToken,
     creationDate,
     creationIP: request.socket.remoteAddress,
-    expirationDate
+    expirationDate,
+    accountID: userData._id
   };
 
   try {
     
-    const { insertedId: sessionID } = await database.collection("sessions").insertOne(sessionData);
-
-    await accountsCollection.updateOne(userFilter, {
-      $push: {
-        sessionIDs: sessionID
-      }
-    });
+    await database.collection("sessions").insertOne({...sessionData, tokenHash: await hashString(sessionToken)});
 
   } catch (error: unknown) {
 
@@ -81,7 +70,7 @@ router.post("/", async (request, response) => {
   }
 
   // Return a 201 success, and a JSON response body with the session data.
-  return response.status(201).json(sessionData);
+  return response.status(201).json({...sessionData, token: sessionToken});
 
 });
 
