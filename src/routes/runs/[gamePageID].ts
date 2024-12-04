@@ -2,11 +2,14 @@ import { Request, Response, Router } from "express";
 import database from "#utils/database-generator.js";
 import { ObjectId } from "mongodb";
 import runIDRouter from "./[gamePageID]/[runID].js";
+import authenticator from "#utils/authenticator.js";
 
 const router = Router({mergeParams: true});
 router.use("/:runID", runIDRouter);
 
+router.post("/", authenticator);
 router.post("/", async (request: Request<{ gamePageID: string }>, response: Response) => {
+
   const { gamePageID } = request.params;
   const { time, url } = request.body;
 
@@ -38,7 +41,7 @@ router.post("/", async (request: Request<{ gamePageID: string }>, response: Resp
   try {
 
     const createdAt = new Date();
-    const result = await database.collection("runs").insertOne({ gamePageID: objectID, time: timeInt, url });
+    const result = await database.collection("runs").insertOne({ gamePageID: objectID, time: timeInt, url, creatorID: response.locals.accountData._id });
     // Return a 201 status code on success, along with the run ID
     return response.status(201).json({ id: result.insertedId });
   } catch (error) {
