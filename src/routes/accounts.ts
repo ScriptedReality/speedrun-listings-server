@@ -50,7 +50,7 @@ router.post("/", async (request, response) => {
   }
 
   // Create an encrypted hash of the user's password.
-  const hashedPassword = hashString(password);
+  const hashedPassword = await hashString(password);
 
   // Try to save the user's account data into a new entry on the database.
   let accountID;
