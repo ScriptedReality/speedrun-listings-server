@@ -1,5 +1,7 @@
 import database from "#utils/database-generator.js";
+import database from "#utils/database-generator.js";
 import { Router } from "express";
+import { hash as hashString } from "argon2";
 import { hash as hashString } from "argon2";
 
 const router = Router();
