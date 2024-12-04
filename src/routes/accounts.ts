@@ -48,11 +48,13 @@ router.post("/", async (request, response) => {
 
     console.error(error);
 
-    response.json({
+    return response.status(500).json({
       message: "Something bad happened on our side. Try again later."
     });
 
   }
+
+  return response.status(201).json({accountID});
 
 });
 
