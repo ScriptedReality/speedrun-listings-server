@@ -9,10 +9,25 @@ router.post("/", async (request, response) => {
   // Verify that a valid email address, username, and password were provided. 
   const {emailAddress, username, password} = request.body;
 
-  if (typeof(emailAddress) !== "string") return response.status(400).json("Email address must be a string.");
-  if (typeof(username) !== "string") return response.status(400).json("Username must be a string.");
-  if (typeof(password) !== "string") return response.status(400).json("Password must be a string.");
-  if (!emailAddress || !username || !password) {
+  if (typeof(emailAddress) !== "string") {
+
+    return response.status(400).json({
+      message: "Email address must be a string."
+    });
+
+  } else if (typeof(username) !== "string") {
+    
+    return response.status(400).json({
+      message: "Username must be a string."
+    });
+
+  } else if (typeof(password) !== "string") {
+    
+    return response.status(400).json({
+      message: "Password must be a string."
+    });
+
+  } else if (!emailAddress.trim() || !username.trim() || !password) {
 
     return response.status(400).json({
       message: `A${!emailAddress ? "n email address" : (!username ? " username" : " password")} is required to create an account.`
