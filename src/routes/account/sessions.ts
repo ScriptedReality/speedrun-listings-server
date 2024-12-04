@@ -53,19 +53,35 @@ router.post("/", async (request, response) => {
   const creationDate = new Date();
   const expirationDate = creationDate;
   expirationDate.setDate(creationDate.getDate() + 30);
-  
-  const {insertedId} = await database.collection("sessions").insertOne({
+  const sessionData = {
     token: sessionToken,
     creationDate,
     creationIP: request.socket.remoteAddress,
     expirationDate
-  });
+  };
 
-  await accountsCollection.updateOne(userFilter, {
-    $push: {
-      sessionIDs: insertedId
-    }
-  });
+  try {
+    
+    const { insertedId: sessionID } = await database.collection("sessions").insertOne(sessionData);
+
+    await accountsCollection.updateOne(userFilter, {
+      $push: {
+        sessionIDs: sessionID
+      }
+    });
+
+  } catch (error: unknown) {
+
+    console.error(error);
+
+    return response.status(500).json({
+      message: "Something bad happened on our side. Try again later."
+    });
+
+  }
+
+  // Return a 201 success, and a JSON response body with the token as the only key-value pair.
+  return response.status(201).json(sessionData);
 
 });
 
