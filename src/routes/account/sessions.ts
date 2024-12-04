@@ -1,6 +1,8 @@
 import database from "#utils/database-generator.js";
 import { Router } from "express";
 import { verify as verifyPassword } from "argon2";
+import { randomBytes } from "crypto";
+import { Collection, ObjectId } from "mongodb";
 
 const router = Router();
 
@@ -28,9 +30,15 @@ router.post("/", async (request, response) => {
 
   }
 
-  const userData = await database.collection("accounts").findOne({
+  const accountsCollection: Collection<{
+    username: string;
+    password: string;
+    sessionIDs: ObjectId[]
+  }> = database.collection("accounts");
+  const userFilter = {
     username: new RegExp(username, "i")
-  });
+  };
+  const userData = await accountsCollection.findOne(userFilter);
 
   if (!userData || await verifyPassword(userData.password, password)) {
 
@@ -39,6 +47,25 @@ router.post("/", async (request, response) => {
     });
 
   }
+
+  // Create a random hashed token and save it to the user's profile in the database.
+  const sessionToken = randomBytes(64).toString("hex");
+  const creationDate = new Date();
+  const expirationDate = creationDate;
+  expirationDate.setDate(creationDate.getDate() + 30);
+  
+  const {insertedId} = await database.collection("sessions").insertOne({
+    token: sessionToken,
+    creationDate,
+    creationIP: request.socket.remoteAddress,
+    expirationDate
+  });
+
+  await accountsCollection.updateOne(userFilter, {
+    $push: {
+      sessionIDs: insertedId
+    }
+  });
 
 });
 
