@@ -5,38 +5,33 @@ import database from "#utils/database-generator.js";
 const router = Router({ mergeParams: true });
 
 router.get("/", async (request: Request<{ gamePageID: string; runID: string }>, response: Response) => {
-  const { gamePageID, runID } = request.params;
+    const { gamePageID, runID } = request.params;
 
-  let gamePageObjectID;
-  try {
-    gamePageObjectID = new ObjectId(gamePageID);
-  } catch (error) {
-    return response.status(404).json({ message: "Game page not found." });
-  }
+    let gamePageObjectID;
+    let runObjectID;
 
-
-  let runObjectID;
-  try {
-    runObjectID = new ObjectId(runID);
-  } catch (error) {
-    return response.status(404).json({ message: "Run not found." });
-  }
-
-  try {
-    const run = await database.collection("runs").findOne({
-      _id: runObjectID,
-      gamePageID: gamePageObjectID
-    });
-
-    if (!run) {
-      return response.status(404).json({ message: "Run not found." });
+    try {
+        gamePageObjectID = new ObjectId(gamePageID);
+        runObjectID = new ObjectId(runID);
+    } catch (error) {
+        return response.status(404).json({ message: "Invalid game page ID or run ID." });
     }
 
-    return response.json(run);
-  } catch (error) {
-    console.error(error);
-    return response.status(500).json({ message: "Internal server error." });
-  }
+    try {
+        const run = await database.collection("runs").findOne({
+            gamePageID: gamePageObjectID,
+            _id: runObjectID
+        });
+
+        if (!run) {
+            return response.status(404).json({ message: "Run not found." });
+        }
+
+        return response.json(run);
+    } catch (error) {
+        console.error(error);
+        return response.status(500).json({ message: "Internal server error. Sowwy!" });
+    }
 });
 
 export default router;

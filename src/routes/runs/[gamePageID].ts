@@ -8,8 +8,11 @@ router.use("/:runID", runIDRouter);
 
 router.post("/", async (request: Request<{ gamePageID: string }>, response: Response) => {
   const { gamePageID } = request.params;
-  const { time, youtubeVideo } = request.body;
+  const { time, url } = request.body;
 
+  console.log('Received body:', request.body);
+  console.log('Time:', time);
+  console.log(typeof url);
   let objectID;
   try {
     objectID = new ObjectId(gamePageID);
@@ -17,20 +20,24 @@ router.post("/", async (request: Request<{ gamePageID: string }>, response: Resp
     return response.status(404).json({ message: "Game page not found." });
   }
 
-  // Verify that the user provides a valid time
-  if (!time || typeof time !== "number" || time <= 0) {
+  // Convert time to an integer and validate
+  const timeInt = parseInt(time, 10);
+  if (isNaN(timeInt) || timeInt <= 0) {
     return response.status(400).json({ message: "Invalid time provided." });
   }
 
   // Verify that the user provides a valid YouTube video URL
-  const youtubeRegex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/;
-  if (!youtubeVideo || typeof youtubeVideo !== "string" || !youtubeRegex.test(youtubeVideo)) {
+  const youtubeRegex = /^(https?\:\/\/)?(www\.youtube\.com\/watch\?v=|youtu\.?be\/).+$/;
+  if (!url || typeof url !== "string" || !youtubeRegex.test(url)) {
     return response.status(400).json({ message: "Invalid YouTube video URL." });
   }
 
+  // Log the received body
+  
+
   try {
     // Try to create a new run entry in the database
-    const result = await database.collection("runs").insertOne({ gamePageID: objectID, time, youtubeVideo });
+    const result = await database.collection("runs").insertOne({ gamePageID: objectID, time: timeInt, url });
     // Return a 201 status code on success, along with the run ID
     return response.status(201).json({ id: result.insertedId });
   } catch (error) {
