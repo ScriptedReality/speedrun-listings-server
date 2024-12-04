@@ -4,7 +4,7 @@ import { verify as verifyPassword } from "argon2";
 import { randomBytes } from "crypto";
 import { Collection, ObjectId } from "mongodb";
 
-const router = Router();
+const router = Router({mergeParams: true});
 
 router.post("/", async (request, response) => {
 
