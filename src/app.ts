@@ -1,4 +1,5 @@
 import express from "express";
+import accountRouter from "./routes/account.js";
 import accountsRouter from "./routes/accounts.js";
 import runsRouter from "./routes/runs.js";
 import gamePagesRouter from "./routes/game-pages.js";
@@ -13,6 +14,7 @@ app.use(cors({
 }));
 app.disable("x-powered-by");
 app.use("/runs", runsRouter);
+app.use("/account", accountRouter);
 app.use("/accounts", accountsRouter);
 app.use("/game-pages", gamePagesRouter);
 
