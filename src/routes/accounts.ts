@@ -1,5 +1,7 @@
 import database from "#utils/database-generator.js";
+import database from "#utils/database-generator.js";
 import { Router } from "express";
+import { hash as hashString } from "argon2";
 import { hash as hashString } from "argon2";
 
 const router = Router();
@@ -50,7 +52,7 @@ router.post("/", async (request, response) => {
   }
 
   // Create an encrypted hash of the user's password.
-  const hashedPassword = hashString(password);
+  const hashedPassword = await hashString(password);
 
   // Try to save the user's account data into a new entry on the database.
   let accountID;
