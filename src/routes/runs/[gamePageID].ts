@@ -36,8 +36,17 @@ router.post("/", async (request: Request<{ gamePageID: string }>, response: Resp
   
 
   try {
+
+    const createdAt = new Date();
+
     // Try to create a new run entry in the database
-    const result = await database.collection("runs").insertOne({ gamePageID: objectID, time: timeInt, url });
+    const result = await database.collection("runs").insertOne({
+      gamePageID: objectID,
+      time: timeInt,
+      url,
+      createdAt // Add the createdAt field
+    });
+
     // Return a 201 status code on success, along with the run ID
     return response.status(201).json({ id: result.insertedId });
   } catch (error) {
