@@ -87,6 +87,15 @@ router.patch("/", async (request: Request<{ gamePageID: string; runID: string }>
     }
 
     const modifications = request.body.modifications;
+
+    if (!modifications || !(typeof(modifications) === "object" && !(modifications instanceof Array))) {
+
+      return response.status(400).json({
+        message: `Your request body is missing a modifications object.`
+      });
+
+    }
+
     const santitizedModifications: {[key: string]: unknown} = {};
     for (const key of Object.keys(modifications)) {
 
@@ -114,7 +123,7 @@ router.patch("/", async (request: Request<{ gamePageID: string; runID: string }>
       if ((key === "isVerified" || key === "creatorID") && !response.locals.accountData.isModerator) {
 
         return response.status(403).json({
-          message: `You don't have permission to modify the ${key}.`
+          message: `You don't have permission to modify the ${key} key.`
         });
 
       }
@@ -124,15 +133,11 @@ router.patch("/", async (request: Request<{ gamePageID: string; runID: string }>
     }
 
     // Try to update the run.
-    const { modifiedCount } = await runsCollection.updateOne({
+    await runsCollection.updateOne({
       _id: runData._id
-    }, santitizedModifications);
-
-    if (modifiedCount == 0) {
-
-      throw new Error("Unknown error while updating the run.");
-
-    }
+    }, {
+      $set: santitizedModifications
+    });
 
   } catch (error: unknown) {
 
