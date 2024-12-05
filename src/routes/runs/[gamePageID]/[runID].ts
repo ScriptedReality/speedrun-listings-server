@@ -86,7 +86,22 @@ router.delete("/", async (request: Request<{ gamePageID: string; runID: string }
 
     }
 
+    // Try to delete the run.
+    const { deletedCount } = await runsCollection.deleteOne({
+      _id: runData._id
+    });
+
+    if (deletedCount == 0) {
+
+      throw new Error("Unknown error while deleting the run.");
+
+    }
+
+    return response.status(207).json({});
+
   } catch (error: unknown) {
+
+    console.error(error);
 
     return response.status(500).json({
       message: "Something bad happened on our end. Try again later."
