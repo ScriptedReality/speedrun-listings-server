@@ -49,24 +49,47 @@ router.delete("/", async (request: Request<{ gamePageID: string; runID: string }
 
   } catch (error: unknown) {
 
+    console.error(error);
+
     return response.status(404).json({
       message: "Run not found."
     });
 
   }
 
-  // Verify that the run exists.
-  const runsCollection = database.collection("runs");
-  const runFilter = {
-    _id: runID,
-    gamePageID
-  };
-  const runCount = await runsCollection.countDocuments(runFilter);
+  try {
 
-  if (runCount == 0) {
+    // Verify that the run exists.
+    const runsCollection = database.collection("runs");
+    const runFilter = {
+      _id: runID,
+      gamePageID
+    };
 
-    return response.status(404).json({
-      message: "Run not found."
+    const runData = await runsCollection.findOne(runFilter);
+
+    if (!runData) {
+
+      return response.status(404).json({
+        message: "Run not found."
+      });
+
+    }
+
+    // Verify that the user has permission to delete the run.
+    const { accountData } = response.locals;
+    if (runData.creatorID !== accountData._id && !request.body.shouldBypassPermissions && !accountData.isModerator) {
+
+      return response.status(403).json({
+        message: "You don't have permission to delete this run."
+      });
+
+    }
+
+  } catch (error: unknown) {
+
+    return response.status(500).json({
+      message: "Something bad happened on our end. Try again later."
     });
 
   }
