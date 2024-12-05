@@ -78,7 +78,7 @@ router.delete("/", async (request: Request<{ gamePageID: string; runID: string }
 
     // Verify that the user has permission to delete the run.
     const { accountData } = response.locals;
-    if (runData.creatorID !== accountData._id && !request.body.shouldBypassPermissions && !accountData.isModerator) {
+    if (!runData.creatorID.equals(accountData._id) && !(request.body.shouldBypassPermissions && accountData.isModerator)) {
 
       return response.status(403).json({
         message: "You don't have permission to delete this run."
@@ -97,7 +97,7 @@ router.delete("/", async (request: Request<{ gamePageID: string; runID: string }
 
     }
 
-    return response.status(207).json({});
+    return response.status(204).json({});
 
   } catch (error: unknown) {
 
