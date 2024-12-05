@@ -7,6 +7,12 @@ import authenticator from "#utils/authenticator.js";
 const router = Router({mergeParams: true});
 router.use("/:runID", runIDRouter);
 
+router.get("/", async (request, response) => {
+
+  
+
+});
+
 router.post("/", authenticator);
 router.post("/", async (request: Request<{ gamePageID: string }>, response: Response) => {
 
