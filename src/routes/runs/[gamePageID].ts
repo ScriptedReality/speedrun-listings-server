@@ -7,9 +7,61 @@ import authenticator from "#utils/authenticator.js";
 const router = Router({mergeParams: true});
 router.use("/:runID", runIDRouter);
 
-router.get("/", async (request, response) => {
+router.get("/", async (request: Request<{ gamePageID: string }>, response) => {
 
-  
+  // Verify that the user provides a valid game page ID.
+  let gamePageID;
+
+  try {
+
+    gamePageID = new ObjectId(request.params.gamePageID);
+
+    // Verify the game page exists.
+    const gamePageCount = await database.collection("gamePages").countDocuments({
+      _id: gamePageID
+    });
+    
+    if (gamePageCount == 0) {
+
+      throw new Error();
+
+    }
+
+  } catch (error: unknown) {
+
+    console.error(error);
+
+    return response.status(404).json({
+      message: "Game page not found."
+    });
+
+  }
+
+  const runs = [];
+  try {
+
+    // Return the list of runs.
+    const runDocuments = await database.collection("runs").find({gamePageID}).toArray();
+    for (const document of runDocuments) {
+
+      const run: {[key: string]: unknown} = {...document};
+      run.id = run._id;
+      delete run._id;
+      runs.push(run);
+
+    }
+
+  } catch (error: unknown) {
+
+    console.error(error);
+
+    response.status(500).json({
+      message: "Something bad happened on our side. Try again later."
+    });
+
+  }
+
+  return response.json(runs);
 
 });
 
