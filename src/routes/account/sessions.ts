@@ -2,9 +2,10 @@ import database from "#utils/database-generator.js";
 import { Router } from "express";
 import { hash as hashString, verify as verifyPassword } from "argon2";
 import { randomBytes } from "crypto";
-import authenticator from "#utils/authenticator.js";
+import sessionIDRouter from "./sessions/[sessionID].js";
 
 const router = Router({mergeParams: true});
+router.use("/:sessionID", sessionIDRouter);
 
 router.post("/", async (request, response) => {
 
@@ -72,13 +73,6 @@ router.post("/", async (request, response) => {
 
   // Return a 201 success, and a JSON response body with the session data.
   return response.status(201).json({...sessionData, token: sessionToken});
-
-});
-
-router.delete("/", authenticator);
-router.delete("/", async (request, response) => {
-
-  // 
 
 });
 
