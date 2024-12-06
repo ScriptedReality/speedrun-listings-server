@@ -38,7 +38,7 @@ router.post("/", async (request, response) => {
   // Ensure that there isn't another user with the same username.
   const accountsCollection = database.collection("accounts");
   const conflictCount = await accountsCollection.countDocuments({
-    username: new RegExp(username, "i")
+    username: new RegExp(`^${username}$`, "i")
   });
 
   if (conflictCount > 0) {
