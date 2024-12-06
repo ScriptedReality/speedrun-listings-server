@@ -10,7 +10,7 @@ router.get("/", async (request, response) => {
 
   const accountData: {[key: string]: unknown} = {};
 
-  for (const key of response.locals.accountData) {
+  for (const key of Object.keys(response.locals.accountData)) {
 
     accountData[key === "_id" ? "accountID" : key] = response.locals.accountData[key];
 

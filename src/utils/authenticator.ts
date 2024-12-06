@@ -5,34 +5,46 @@ import { ObjectId } from "mongodb";
 
 async function authenticator(request: Request, response: Response, next: NextFunction) {
 
-  const token = request.headers.token;
-  const accountIDString = request.headers["account-id"];
+  try {
 
-  if (typeof(token) == "string" && typeof(accountIDString) == "string") {
+    const token = request.headers.token;
+    const accountIDString = request.headers["account-id"];
 
-    const accountID = new ObjectId(accountIDString);
-    const sessions = await database.collection("sessions").find({accountID}).toArray();
+    if (typeof(token) == "string" && typeof(accountIDString) == "string") {
 
-    for (const session of sessions) {
+      const accountID = new ObjectId(accountIDString);
+      const sessions = await database.collection("sessions").find({accountID}).toArray();
 
-      if (await verify(session.tokenHash, token)) {
+      for (const session of sessions) {
 
-        // Save account data.
-        const accountData = await database.collection("accounts").findOne({_id: accountID});
-        response.locals.accountData = accountData;
+        if (await verify(session.tokenHash, token)) {
 
-        next();
-        return;
+          // Save account data.
+          const accountData = await database.collection("accounts").findOne({_id: accountID});
+          response.locals.accountData = accountData;
+
+          next();
+          return;
+
+        }
 
       }
 
     }
 
-  }
+    return response.status(401).json({
+      message: "Provide valid authentication token and account ID headers."
+    });
 
-  response.status(401).json({
-    message: "Provide valid authentication token and account ID headers."
-  });
+  } catch (error: unknown) {
+
+    console.error(error);
+
+    return response.status(500).json({
+      message: "Something bad happened on our side. Try again later."
+    });
+
+  }
 
 }
 
