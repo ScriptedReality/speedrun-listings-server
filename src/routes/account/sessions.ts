@@ -57,9 +57,13 @@ router.post("/", async (request, response) => {
     accountID: userData._id
   };
 
+  let sessionID;
+
   try {
     
-    await database.collection("sessions").insertOne({...sessionData, tokenHash: await hashString(sessionToken)});
+    const { insertedId } = await database.collection("sessions").insertOne({...sessionData, tokenHash: await hashString(sessionToken)});
+
+    sessionID = insertedId;
 
   } catch (error: unknown) {
 
@@ -72,7 +76,7 @@ router.post("/", async (request, response) => {
   }
 
   // Return a 201 success, and a JSON response body with the session data.
-  return response.status(201).json({...sessionData, token: sessionToken});
+  return response.status(201).json({...sessionData, token: sessionToken, sessionID});
 
 });
 
