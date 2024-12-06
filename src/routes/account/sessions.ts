@@ -33,7 +33,7 @@ router.post("/", async (request, response) => {
 
   const accountsCollection = database.collection("accounts");
   const userFilter = {
-    username: new RegExp(username, "i")
+    username: new RegExp(`^${username}$`, "i")
   };
   const userData = await accountsCollection.findOne(userFilter);
 
