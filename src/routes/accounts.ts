@@ -1,8 +1,10 @@
 import database from "#utils/database-generator.js";
 import { Router } from "express";
 import { hash as hashString } from "argon2";
+import accountIDRouter from "./accounts/[accountID].js";
 
 const router = Router();
+router.use("/:accountID", accountIDRouter);
 
 router.post("/", async (request, response) => {
 
